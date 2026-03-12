@@ -338,44 +338,51 @@ export default function ContasPagar() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <input
-            type="text"
-            placeholder="Buscar..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full px-4 py-3 pl-10 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all"
-          />
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-2 flex-1 items-center">
-          <div className="flex items-center gap-2 w-full sm:w-auto">
+      <div className="flex flex-col gap-4 bg-gray-50 dark:bg-gray-800/20 p-4 rounded-2xl border border-gray-100 dark:border-gray-800">
+        <div className="flex flex-col lg:flex-row gap-3">
+          <div className="relative flex-1">
             <input
-              type="date"
-              value={filterDateStart}
-              onChange={e => handleFilterChange('start', e.target.value)}
-              className="px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all text-sm flex-1 sm:w-36"
+              type="text"
+              placeholder="Buscar por descrição, proprietário ou valor..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full px-4 py-3 pl-10 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all font-medium"
             />
-            <span className="text-gray-400 hidden sm:inline">até</span>
-            <input
-              type="date"
-              value={filterDateEnd}
-              onChange={e => handleFilterChange('end', e.target.value)}
-              className="px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all text-sm flex-1 sm:w-36"
-            />
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
           </div>
-          <select
-            value={filterStatus}
-            onChange={e => handleFilterChange('status', e.target.value)}
-            className="w-full sm:w-auto px-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all text-sm"
-          >
-            <option value="todos">Todos</option>
-            <option value="em_aberto">Em Aberto</option>
-            <option value="pago">Pago</option>
-            <option value="vencido">Vencidos</option>
-            <option value="vencendo_3_dias">Vencendo em 3 dias</option>
-          </select>
+          
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl px-3 py-1.5 shadow-sm">
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Período:</span>
+              <input
+                type="date"
+                value={filterDateStart}
+                onChange={e => handleFilterChange('start', e.target.value)}
+                className="bg-transparent border-none focus:ring-0 text-sm w-32 dark:color-white"
+                title="Data de Início"
+              />
+              <span className="text-gray-300">→</span>
+              <input
+                type="date"
+                value={filterDateEnd}
+                onChange={e => handleFilterChange('end', e.target.value)}
+                className="bg-transparent border-none focus:ring-0 text-sm w-32 dark:color-white"
+                title="Data de Fim"
+              />
+            </div>
+
+            <select
+              value={filterStatus}
+              onChange={e => handleFilterChange('status', e.target.value)}
+              className="px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all text-sm font-semibold shadow-sm min-w-[140px]"
+            >
+              <option value="todos">Todos os Status</option>
+              <option value="em_aberto">💰 Em Aberto</option>
+              <option value="pago">✅ Pago</option>
+              <option value="vencido">⚠️ Vencidos</option>
+              <option value="vencendo_3_dias">⏳ Vencendo em 3 dias</option>
+            </select>
+          </div>
         </div>
       </div>
 
