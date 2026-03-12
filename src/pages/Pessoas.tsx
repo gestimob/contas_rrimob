@@ -36,7 +36,6 @@ export default function Pessoas() {
     const { data } = await supabase
       .from('pessoas')
       .select('*')
-      .eq('user_id', user!.id)
       .order('nome')
     setPessoas(data || [])
     setLoading(false)

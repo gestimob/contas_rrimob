@@ -106,7 +106,6 @@ export default function ContasPagar() {
     const { data } = await supabase
       .from('contas_pagar')
       .select('*, pessoa:pessoas(nome), tipo:tipos_conta(nome), descricao:descricoes_conta(nome)')
-      .eq('user_id', user!.id)
       .order('created_at', { ascending: false })
     setContas((data as Conta[]) || [])
     setLoading(false)

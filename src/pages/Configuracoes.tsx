@@ -38,7 +38,6 @@ export default function Configuracoes() {
     const { data } = await supabase
       .from('configuracoes')
       .select('*')
-      .eq('user_id', user!.id)
       .maybeSingle()
 
     if (data) {

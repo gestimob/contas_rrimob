@@ -51,12 +51,10 @@ export default function Dashboard() {
       supabase
         .from('contas_pagar')
         .select('*, pessoa:pessoas(nome), tipo:tipos_conta(nome), descricao:descricoes_conta(nome)')
-        .eq('user_id', user!.id)
         .order('vencimento', { ascending: true }),
       supabase
         .from('pessoas')
         .select('id, nome')
-        .eq('user_id', user!.id)
         .order('nome')
     ])
 

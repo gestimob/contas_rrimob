@@ -55,9 +55,9 @@ export default function ContaForm() {
 
   const loadOptions = async () => {
     const [p, t, d] = await Promise.all([
-      supabase.from('pessoas').select('id, nome').eq('user_id', user!.id).order('nome'),
-      supabase.from('tipos_conta').select('id, nome').eq('user_id', user!.id).order('nome'),
-      supabase.from('descricoes_conta').select('id, nome').eq('user_id', user!.id).order('nome'),
+      supabase.from('pessoas').select('id, nome').order('nome'),
+      supabase.from('tipos_conta').select('id, nome').order('nome'),
+      supabase.from('descricoes_conta').select('id, nome').order('nome'),
     ])
     setPessoas(p.data || [])
     setTipos(t.data || [])
