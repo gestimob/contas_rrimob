@@ -85,6 +85,8 @@ export default function ContasPagar() {
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState<string>(searchParams.get('status') || 'todos')
   const [filterData, setFilterData] = useState<string | null>(searchParams.get('data'))
+  const [filterDateStart, setFilterDateStart] = useState<string>(searchParams.get('start') || '')
+  const [filterDateEnd, setFilterDateEnd] = useState<string>(searchParams.get('end') || '')
   const [filterTipo, setFilterTipo] = useState<string | null>(searchParams.get('tipo'))
   const [filterMes, setFilterMes] = useState<string | null>(searchParams.get('mes'))
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
@@ -94,6 +96,8 @@ export default function ContasPagar() {
   useEffect(() => {
     setFilterStatus(searchParams.get('status') || 'todos')
     setFilterData(searchParams.get('data'))
+    setFilterDateStart(searchParams.get('start') || '')
+    setFilterDateEnd(searchParams.get('end') || '')
     setFilterTipo(searchParams.get('tipo'))
     setFilterMes(searchParams.get('mes'))
   }, [searchParams])
@@ -130,8 +134,14 @@ export default function ContasPagar() {
     const { data: config } = await supabase.from('configuracoes').select('nome_empresa, logo_url').limit(1).single()
 
     let filterText = `Status: ${filterLabel(filterStatus)}`
-    if (filterData) {
-      filterText += ` | Período: ${formatDate(filterData)}`
+    if (filterDateStart && filterDateEnd) {
+      filterText += ` | Período: ${formatDate(filterDateStart)} até ${formatDate(filterDateEnd)}`
+    } else if (filterDateStart) {
+      filterText += ` | Desde: ${formatDate(filterDateStart)}`
+    } else if (filterDateEnd) {
+      filterText += ` | Até: ${formatDate(filterDateEnd)}`
+    } else if (filterData) {
+      filterText += ` | Data: ${formatDate(filterData)}`
     } else {
       filterText += ' | Período: Todos'
     }
@@ -160,13 +170,14 @@ export default function ContasPagar() {
     })
   }
 
-  const handleFilterChange = (value: string) => {
-    setFilterStatus(value)
-    if (value === 'todos') {
-      setSearchParams({})
+  const handleFilterChange = (key: string, value: string) => {
+    const newParams = new URLSearchParams(searchParams)
+    if (!value || value === 'todos') {
+      newParams.delete(key)
     } else {
-      setSearchParams({ status: value })
+      newParams.set(key, value)
     }
+    setSearchParams(newParams)
   }
 
   const filtered = contas.filter(c => {
@@ -217,7 +228,13 @@ export default function ContasPagar() {
     }
 
     let matchDate = true
-    if (filterData) {
+    if (filterDateStart && filterDateEnd) {
+      matchDate = c.vencimento >= filterDateStart && c.vencimento <= filterDateEnd
+    } else if (filterDateStart) {
+      matchDate = c.vencimento >= filterDateStart
+    } else if (filterDateEnd) {
+      matchDate = c.vencimento <= filterDateEnd
+    } else if (filterData) {
       matchDate = c.vencimento === filterData
     }
 
@@ -281,14 +298,24 @@ export default function ContasPagar() {
           {(filterStatus !== 'todos' || filterData || filterTipo || filterMes) && (
             <p className="text-sm text-gray-500 mt-1">
               {filterStatus !== 'todos' && <span>Status: <span className="font-medium text-primary-500">{filterLabel(filterStatus)}</span></span>}
-              {filterStatus !== 'todos' && (filterData || filterTipo || filterMes) && <span className="mx-2">•</span>}
+              {filterStatus !== 'todos' && (filterData || filterDateStart || filterDateEnd || filterTipo || filterMes) && <span className="mx-2">•</span>}
+              {filterDateStart && filterDateEnd ? (
+                <span>Período: <span className="font-medium text-primary-500">{formatDate(filterDateStart)} a {formatDate(filterDateEnd)}</span></span>
+              ) : (
+                <>
+                  {filterDateStart && <span>Início: <span className="font-medium text-primary-500">{formatDate(filterDateStart)}</span></span>}
+                  {filterDateStart && filterDateEnd && <span className="mx-2">•</span>}
+                  {filterDateEnd && <span>Fim: <span className="font-medium text-primary-500">{formatDate(filterDateEnd)}</span></span>}
+                </>
+              )}
+              {(filterDateStart || filterDateEnd) && (filterData || filterTipo || filterMes) && <span className="mx-2">•</span>}
               {filterData && <span>Data: <span className="font-medium text-primary-500">{formatDate(filterData)}</span></span>}
               {filterData && (filterTipo || filterMes) && <span className="mx-2">•</span>}
               {filterTipo && <span>Tipo: <span className="font-medium text-primary-500">{filterTipo}</span></span>}
               {filterTipo && filterMes && <span className="mx-2">•</span>}
               {filterMes && <span>Mês: <span className="font-medium text-primary-500">{filterMes}</span></span>}
               
-              <button onClick={() => { setSearchParams({}); }} className="ml-3 text-xs text-gray-400 hover:text-gray-600 underline">
+              <button onClick={() => { setSearchParams({}); setSearch(''); }} className="ml-3 text-xs text-gray-400 hover:text-gray-600 underline">
                 limpar tudo
               </button>
             </p>
@@ -322,17 +349,34 @@ export default function ContasPagar() {
           />
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
         </div>
-        <select
-          value={filterStatus}
-          onChange={e => handleFilterChange(e.target.value)}
-          className="px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all"
-        >
-          <option value="todos">Todos</option>
-          <option value="em_aberto">Em Aberto</option>
-          <option value="pago">Pago</option>
-          <option value="vencido">Vencidos</option>
-          <option value="vencendo_3_dias">Vencendo em 3 dias</option>
-        </select>
+        <div className="flex flex-col sm:flex-row gap-2 flex-1 items-center">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <input
+              type="date"
+              value={filterDateStart}
+              onChange={e => handleFilterChange('start', e.target.value)}
+              className="px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all text-sm flex-1 sm:w-36"
+            />
+            <span className="text-gray-400 hidden sm:inline">até</span>
+            <input
+              type="date"
+              value={filterDateEnd}
+              onChange={e => handleFilterChange('end', e.target.value)}
+              className="px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all text-sm flex-1 sm:w-36"
+            />
+          </div>
+          <select
+            value={filterStatus}
+            onChange={e => handleFilterChange('status', e.target.value)}
+            className="w-full sm:w-auto px-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all text-sm"
+          >
+            <option value="todos">Todos</option>
+            <option value="em_aberto">Em Aberto</option>
+            <option value="pago">Pago</option>
+            <option value="vencido">Vencidos</option>
+            <option value="vencendo_3_dias">Vencendo em 3 dias</option>
+          </select>
+        </div>
       </div>
 
       {filtered.length === 0 ? (
