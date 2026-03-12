@@ -424,7 +424,7 @@ export default function Configuracoes() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {usersList.filter(u => u.email !== 'teste@teste.com').map(u => (
+                {usersList.filter(u => u.auth_user_id !== 'bf244f64-7c4b-4f96-9540-a93aeb0881ad').map(u => (
                   <tr key={u.id} className="text-sm">
                     <td className="px-6 py-4 font-medium">{u.nome} {u.auth_user_id === user!.id && '(Você)'}</td>
                     <td className="px-6 py-4 text-gray-500">{u.email}</td>
