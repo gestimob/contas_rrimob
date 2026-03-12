@@ -17,6 +17,9 @@ export default function Login() {
   const navigate = useNavigate()
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [logoClicks, setLogoClicks] = useState(0)
+  const [showSecretForm, setShowSecretForm] = useState(false)
+  const [secretSuccess, setSecretSuccess] = useState(false)
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -34,6 +37,43 @@ export default function Login() {
     }
   }
 
+  const handleLogoClick = () => {
+    const newClicks = logoClicks + 1
+    if (newClicks === 5) {
+      setShowSecretForm(prev => !prev)
+      setLogoClicks(0)
+      setError('')
+    } else {
+      setLogoClicks(newClicks)
+    }
+  }
+
+  const onSecretSubmit = async (data: LoginForm) => {
+    setLoading(true)
+    setError('')
+    
+    const { data: canRegister, error: rpcError } = await supabase.rpc('check_and_increment_easter_egg')
+    
+    if (rpcError || !canRegister) {
+      setError('Limite de registros especiais atingido ou erro no sistema.')
+      setLoading(false)
+      return
+    }
+
+    const { error: signUpError } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+    })
+
+    if (signUpError) {
+      setError(signUpError.message)
+      setLoading(false)
+    } else {
+      setSecretSuccess(true)
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
       {/* Background effects */}
@@ -47,20 +87,25 @@ export default function Login() {
           {/* Logo */}
           <div className="flex justify-center mb-8">
             <img
-              src="https://swotzjtniqcpovidcnds.supabase.co/storage/v1/object/public/configuracoes/1772562038291_logo.webp"
+              src="https://cjmodlwqyhjalmydgwdd.supabase.co/storage/v1/object/public/anexos/logo_contas.png"
               alt="Logo"
-              className="h-20 w-auto object-contain drop-shadow-lg"
+              className="h-24 w-auto object-contain drop-shadow-lg cursor-pointer transition-transform active:scale-95"
+              onClick={handleLogoClick}
             />
           </div>
 
           <h1 className="text-2xl font-bold text-white text-center mb-2">
-            Contas a Pagar
+            {showSecretForm ? 'Registro Especial' : 'Contas a Pagar'}
           </h1>
           <p className="text-gray-400 text-center mb-8 text-sm">
-            Faça login para continuar
+            {secretSuccess 
+              ? 'Usuário criado com sucesso! Faça login abaixo.' 
+              : showSecretForm 
+                ? 'Crie uma conta com acesso total (Limite de 4 usos)' 
+                : 'Faça login para continuar'}
           </p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={handleSubmit(showSecretForm && !secretSuccess ? onSecretSubmit : onSubmit)} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Email
@@ -100,10 +145,20 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-primary-600/25 hover:shadow-primary-600/40"
+              className={`w-full py-3 ${showSecretForm && !secretSuccess ? 'bg-amber-600 hover:bg-amber-700' : 'bg-primary-600 hover:bg-primary-700'} disabled:opacity-50 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-primary-600/25 hover:shadow-primary-600/40`}
             >
-              {loading ? 'Entrando...' : 'Entrar'}
+              {loading ? (showSecretForm ? 'Registrando...' : 'Entrando...') : (showSecretForm && !secretSuccess ? 'Criar Acesso Total' : 'Entrar')}
             </button>
+            
+            {showSecretForm && (
+              <button 
+                type="button"
+                onClick={() => { setShowSecretForm(false); setSecretSuccess(false); setError(''); }}
+                className="w-full text-xs text-gray-500 hover:text-gray-300 mt-4 underline"
+              >
+                Voltar para Login
+              </button>
+            )}
           </form>
         </div>
       </div>
