@@ -38,6 +38,7 @@ export default function Configuracoes() {
     const { data } = await supabase
       .from('configuracoes')
       .select('*')
+      .limit(1)
       .maybeSingle()
 
     if (data) {
@@ -143,8 +144,14 @@ export default function Configuracoes() {
     if (configId) {
       await supabase.from('configuracoes').update(payload).eq('id', configId)
     } else {
-      const { data: created } = await supabase.from('configuracoes').insert(payload).select().single()
-      if (created) setConfigId(created.id)
+      const { data: existing } = await supabase.from('configuracoes').select('id').limit(1).maybeSingle()
+      if (existing) {
+        await supabase.from('configuracoes').update(payload).eq('id', existing.id)
+        setConfigId(existing.id)
+      } else {
+        const { data: created } = await supabase.from('configuracoes').insert(payload).select().single()
+        if (created) setConfigId(created.id)
+      }
     }
 
     setLoading(false)
