@@ -102,7 +102,7 @@ export default function Login() {
             {secretSuccess 
               ? 'Usuário criado com sucesso! Faça login abaixo.' 
               : showSecretForm 
-                ? 'Crie uma conta com acesso total (Limite de 4 usos)' 
+                ? 'Crie sua conta para acessar o Contas a Pagar.' 
                 : 'Faça login para continuar'}
           </p>
 
