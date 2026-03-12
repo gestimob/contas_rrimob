@@ -1,0 +1,14 @@
+node_modules
+.env
+dist
+.vscode
+.DS_Store
+*.local
+.agents/
+.agent/
+_agents/
+_agent/
+brain/
+implementation_plan.md
+task.md
+walkthrough.md

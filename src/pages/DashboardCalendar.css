@@ -1,0 +1,83 @@
+.custom-calendar-wrapper .react-calendar {
+  width: 100%;
+  max-width: 400px;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+}
+
+.custom-calendar-wrapper .react-calendar__navigation button {
+  min-width: 44px;
+  background: transparent;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.dark .custom-calendar-wrapper .react-calendar__navigation button {
+  color: #f3f4f6;
+}
+
+.custom-calendar-wrapper .react-calendar__navigation button:hover,
+.custom-calendar-wrapper .react-calendar__navigation button:focus {
+  background-color: rgba(107, 114, 128, 0.1);
+}
+
+.custom-calendar-wrapper .react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 0.75em;
+  padding: 8px 0;
+}
+
+.dark .custom-calendar-wrapper .react-calendar__month-view__weekdays {
+  color: #9ca3af;
+}
+
+.custom-calendar-wrapper .react-calendar__month-view__days__day--weekend {
+  color: #ef4444;
+}
+
+.custom-calendar-wrapper .react-calendar__tile {
+  padding: 10px 6px;
+  background: none;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.dark .custom-calendar-wrapper .react-calendar__tile {
+  color: #e5e7eb;
+}
+
+.custom-calendar-wrapper .react-calendar__tile:hover {
+  background-color: rgba(107, 114, 128, 0.1);
+}
+
+.custom-calendar-wrapper .react-calendar__tile--now {
+  background: rgba(59, 130, 246, 0.15);
+  font-weight: bold;
+}
+
+/* The default view for highlighted days */
+.custom-calendar-wrapper .react-calendar__tile.has-bills {
+  background-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+.custom-calendar-wrapper .react-calendar__tile.has-bills:hover {
+  background-color: #2563eb !important;
+}
+
+/* Fix for today when it has bills */
+.custom-calendar-wrapper .react-calendar__tile--now.has-bills {
+  background-color: #3b82f6 !important; 
+}
+
+.custom-calendar-wrapper .react-calendar__tile--active {
+  background: rgba(59, 130, 246, 0.3) !important;
+}
+
+.custom-calendar-wrapper .react-calendar__month-view__days__day--neighboringMonth {
+  color: #9ca3af;
+  opacity: 0.5;
+}
